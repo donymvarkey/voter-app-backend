@@ -1,0 +1,61 @@
+{
+  "name": "nodejs-server-boilerplate",
+  "version": "1.0.2",
+  "description": "Boilerplate for a Node.js Server with either MySQL or MONGODB as database. (Ofcourse you can use some other databases.)",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/donymvarkey/nodejs-server-boilerplate.git"
+  },
+  "keywords": [
+    "backend",
+    "nodejs",
+    "mongodb",
+    "server",
+    "template"
+  ],
+  "author": "Dony M Varkey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/donymvarkey/nodejs-server-boilerplate.git"
+  },
+  "homepage": "https://github.com/donymvarkey/nodejs-server-boilerplate.git#README",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@hapi/joi": "^17.1.1",
+    "app-root-path": "^3.1.0",
+    "bcrypt": "^5.1.1",
+    "bluebird": "^3.7.2",
+    "bull": "^4.14.0",
+    "chalk": "^5.3.0",
+    "cors": "^2.8.5",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-validator": "^7.0.1",
+    "firebase-admin": "^12.2.0",
+    "google-auth-library": "^9.11.0",
+    "http-status": "^1.7.4",
+    "joi": "^17.13.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.3",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "redis": "^4.6.14",
+    "winston": "^3.13.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "eslint": "^9.1.1",
+    "nodemon": "^3.1.0"
+  }
+}
