@@ -2,7 +2,10 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const { connectMongodb } = require("./database/DataBaseController");
+const {
+  connectMongodb,
+  connectToRedis,
+} = require("./database/DataBaseController");
 const returnResponse = require("./helpers/apiResponse");
 
 const AuthRoute = require("./routes/AuthRoute");
@@ -27,13 +30,12 @@ class Server {
     api.use(morgan("dev"));
 
     //echo route
-    api.use("/echo", function (req, res) {
+    api.use("/api/health", function (req, res) {
       res.json({
         health: true,
       });
     });
 
-    // api.use("/s", express.static("./src/public"));
     api.set("x-powered-by", false);
 
     this.api = api;
@@ -54,18 +56,25 @@ class Server {
     await this.configServer();
 
     connectMongodb(this.options.mongodb.uri);
+    connectToRedis(this.options.redis_uri);
     await this.mountRoutes();
 
-    this.api.use((req, res, next) => {
+    this.api.use((req, res) => {
       logger.error("Route not found");
-      returnResponse({ code: 404, msg: "Endpoint not found", data: null }, res);
-      next(error);
+      res.status(404).json({
+        msg: "Route not found",
+        status: false,
+      });
+      // next(error);
     });
 
     this.api.use((error, req, res, next) => {
       const msg = error.message || "Internal Server Error";
-      logger.error(`Something went wrong:: ${JSON.stringify(error)}`);
-      returnResponse({ code: 500, msg, data: null }, res);
+      logger.error(`Something went wrong:: error`);
+      res.status(500).json({
+        msg: "Internal server error",
+        status: false,
+      });
     });
 
     const server = this.api.listen(this.options.port, () => {
@@ -75,8 +84,8 @@ class Server {
       logger.info(`Listening on http://${host}:${port}`);
     });
 
-    const shutdown = () => {
-      console.log("Received signal, shutting down gracefully...");
+    const shutdown = (signal) => {
+      logger.info(`Received signal ${signal}. Shutting down gracefully`);
       server.close(() => {
         logger.info("Closed out remaining connections");
         process.exit(0);

@@ -1,8 +1,10 @@
 "use strict";
 const { createLogger, format, transports } = require("winston");
+require("winston-daily-rotate-file");
 const fs = require("fs");
 const path = require("path");
 const appRootPath = require("app-root-path");
+
 const maxSizeInBytes = 5 * 1024 * 1024;
 
 const options = {
@@ -12,7 +14,9 @@ const options = {
     json: true,
     handleExceptions: true,
     datePattern: "YYYY-MM-DD-HH",
-    filename: `app.log`,
+    filename: `app_log_%DATE%.log`,
+    maxSize: "5m",
+    maxFiles: "7d",
     format: format.combine(
       format.printf((i) =>
         i.level === "info" ? `${i.level}: ${i.timestamp} ${i.message}` : ""
@@ -24,7 +28,10 @@ const options = {
     dirname: "logs",
     json: true,
     handleExceptions: true,
-    filename: `app.log`,
+    datePattern: "YYYY-MM-DD-HH",
+    filename: `app_log_%DATE%.log`,
+    maxSize: "5m",
+    maxFiles: "7d",
     format: format.combine(
       format.printf((i) =>
         i.level === "error" ? `${i.level}: ${i.timestamp} ${i.message}` : ""
@@ -41,13 +48,13 @@ const options = {
 
 const logger = new createLogger({
   format: format.combine(
-    format.timestamp({ format: "MMM-DD-YYYY HH:mm:ss" }),
+    format.timestamp({ format: "MMM-DD-YYYY hh:mm:ss" }),
     format.align(),
     format.printf((i) => `${i.level}: ${[i.timestamp]}: ${i.message}`)
   ),
   transports: [
-    new transports.File(options.info),
-    new transports.File(options.error),
+    new transports.DailyRotateFile(options.info),
+    new transports.DailyRotateFile(options.error),
     new transports.Console(options.console),
   ],
   exitOnError: false,
@@ -80,8 +87,8 @@ const monitorLogFileSize = (logFilePath) => {
 
 const logPath = path.join(appRootPath.path, "/logs/app.log");
 
-setInterval(() => {
-  monitorLogFileSize(logPath);
-}, 60 * 1000);
+// setInterval(() => {
+//   monitorLogFileSize(logPath);
+// }, 60 * 1000);
 
 module.exports = { logger };

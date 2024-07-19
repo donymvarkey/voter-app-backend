@@ -1,26 +1,26 @@
-version: "3.9"
+version: "3"
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
     depends_on:
       - mongo
-    environment:
-      - MONGO_URL=mongodb://localhost:27017/expense-manager
-      - PORT=3000
-      - SIGNATURE=b8942bcc5bc3c417813ea24231eab15673dbc620e2cf72bcbf9c1df510701a74
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - redis
 
   mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: voter
 
-volumes:
-  mongo-data:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
