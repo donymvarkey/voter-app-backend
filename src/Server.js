@@ -2,53 +2,58 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const { createServer } = require("node:http");
+const swaggerUi = require("swagger-ui-express");
 const {
   connectMongodb,
   connectToRedis,
 } = require("./database/DataBaseController");
-const returnResponse = require("./helpers/apiResponse");
+const { logger } = require("./logger/Logger");
+const { setupSocketServer } = require("./config/SocketConfig");
+const { swaggerSpec } = require("./config/Swagger");
 
+// Import Routes
 const AuthRoute = require("./routes/AuthRoute");
 const ElectionRoute = require("./routes/ElectionRoute");
 const FileUploadRoute = require("./routes/FileUploadRoute");
 const CandidatesRoute = require("./routes/CandidatesRoute");
 const UserRoute = require("./routes/UserRoute");
-const { logger } = require("./logger/Logger");
+const HealthRoute = require("./routes/HealthRoute");
 
 class Server {
   constructor(options) {
     this.options = options;
     this.api = null;
+    this.httpServer = null;
   }
 
   async configServer() {
-    var api = express();
+    const api = express();
+    const httpServer = createServer(api);
 
     api.use(express.urlencoded({ limit: "10mb", extended: true }));
     api.use(express.json({ limit: "10mb", extended: true }));
     api.use(cors()); //allow cross domain requesting of urls
     api.use(morgan("dev"));
 
-    //echo route
-    api.use("/api/health", function (req, res) {
-      res.json({
-        health: true,
-      });
-    });
-
     api.set("x-powered-by", false);
 
     this.api = api;
+    this.httpServer = httpServer;
 
     return true;
   }
 
   async mountRoutes() {
     this.api.use("/api/auth", AuthRoute);
+    this.api.use("/api/candidates", CandidatesRoute);
     this.api.use("/api/election", ElectionRoute);
     this.api.use("/api/file", FileUploadRoute);
-    this.api.use("/api/candidates", CandidatesRoute);
+    this.api.use("/api/health", HealthRoute);
     this.api.use("/api/user", UserRoute);
+
+    // Swagger Setup
+    this.api.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     return true;
   }
 
@@ -77,16 +82,15 @@ class Server {
       });
     });
 
-    const server = this.api.listen(this.options.port, () => {
-      const address = server.address();
-      const host = address.address === "::" ? "localhost" : address.address;
-      const port = address.port;
-      logger.info(`Listening on http://${host}:${port}`);
+    this.httpServer.listen(this.options.port, () => {
+      logger.info(`Listening on port ${this.options.port}`);
     });
+
+    setupSocketServer(this.httpServer);
 
     const shutdown = (signal) => {
       logger.info(`Received signal ${signal}. Shutting down gracefully`);
-      server.close(() => {
+      this.httpServer.close(() => {
         logger.info("Closed out remaining connections");
         process.exit(0);
       });

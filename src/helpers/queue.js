@@ -4,6 +4,7 @@ const Candidates = require("../models/Candidates");
 const User = require("../models/User");
 const { convertDate } = require("./utils");
 const { sendNotification } = require("../controllers/NotificationController");
+const logger = require("../logger/Logger");
 
 const excelQueue = new Queue("excel-queue");
 
@@ -13,7 +14,7 @@ const addToQueue = (data) => {
     item_id: data.electionId,
     userId: data.userId,
   });
-  console.log("job added to queue");
+  logger.info("job added to queue");
 };
 
 const getUserFcmToken = async (userId) => {
@@ -21,13 +22,13 @@ const getUserFcmToken = async (userId) => {
     const data = await User.findById(userId);
     return data.fcm_token;
   } catch (error) {
-    console.log("error", error);
+    logger.error("error", error);
   }
 };
 
 excelQueue.process(async (job, done) => {
   try {
-    console.log(`${JSON.stringify(job)} staring...`);
+    logger.info(`${JSON.stringify(job)} staring...`);
     // const workbook = xlsx.read(req.file.buffer, { type: "buffer" });
     const workbook = xlsx.readFile(job.data.job);
     const sheetName = workbook.SheetNames[0];
@@ -48,7 +49,7 @@ excelQueue.process(async (job, done) => {
 
     const data = await Candidates.insertMany(candidates);
     if (data) {
-      console.log("Job complete");
+      logger.info("Job complete");
       await sendNotification(
         fcmToken,
         "Upload Complete",

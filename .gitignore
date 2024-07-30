@@ -6,3 +6,6 @@ dump.rdb
 seeds
 firebase-config.json
 uploads
+yarn.lock
+package-lock.json
+.vscode

@@ -34,6 +34,7 @@ const connectToRedis = async (uri) => {
 
   redisClient.on("error", (err) => {
     logger.error(`Failed to connect to redis:: ${err}`);
+    process.exit();
   });
 
   await redisClient.connect();

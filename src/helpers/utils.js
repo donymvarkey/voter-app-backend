@@ -45,7 +45,10 @@ const structureGraphData = (expenses) => {
 };
 
 const convertDate = (dateStr) => {
-  const format = "dd/MM/yyyy";
+  let format = "dd/MM/yyyy";
+  if (dateStr.includes("-")) {
+    format = "dd-MMM-yy";
+  }
   const parsedDate = parse(dateStr, format, new Date());
   return formatISO(parsedDate);
 };
