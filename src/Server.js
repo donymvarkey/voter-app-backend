@@ -11,6 +11,7 @@ const {
 const { logger } = require("./logger/Logger");
 const { setupSocketServer } = require("./config/SocketConfig");
 const { swaggerSpec } = require("./config/Swagger");
+// require("./config/sentry");
 
 // Import Routes
 const AuthRoute = require("./routes/AuthRoute");
@@ -35,7 +36,6 @@ class Server {
     api.use(express.json({ limit: "10mb", extended: true }));
     api.use(cors()); //allow cross domain requesting of urls
     api.use(morgan("dev"));
-
     api.set("x-powered-by", false);
 
     this.api = api;
@@ -52,16 +52,22 @@ class Server {
     this.api.use("/api/health", HealthRoute);
     this.api.use("/api/user", UserRoute);
 
+    const swaggerOptions = {
+      customCssUrl:
+        "https://github.com/ostranme/swagger-ui-themes/blob/develop/themes/3.x/theme-flattop.css",
+    };
+
     // Swagger Setup
-    this.api.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    this.api.use(
+      "/api/docs",
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerSpec, swaggerOptions)
+    );
     return true;
   }
 
   async startServer() {
     await this.configServer();
-
-    connectMongodb(this.options.mongodb.uri);
-    connectToRedis(this.options.redis_uri);
     await this.mountRoutes();
 
     this.api.use((req, res) => {
@@ -82,8 +88,10 @@ class Server {
       });
     });
 
-    this.httpServer.listen(this.options.port, () => {
+    this.httpServer.listen(this.options.port, async () => {
       logger.info(`Listening on port ${this.options.port}`);
+      await connectMongodb(this.options.mongodb.uri);
+      await connectToRedis(this.options.redis_uri);
     });
 
     setupSocketServer(this.httpServer);

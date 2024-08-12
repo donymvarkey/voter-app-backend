@@ -14,19 +14,22 @@ const connectMongodb = async (uri) => {
     .connect(uri)
     .then(() => {
       logger.info("Connected to mongodb instance");
+      return true;
     })
     .catch((err) => {
       logger.error(`Failed to connect to MongoDB: ${err}`);
+      return false;
     });
 };
 
 const connectToRedis = async (uri) => {
-  // console.log("Connecting to redis instance", uri);
   logger.info(`Connecting to redis instance:: ${uri}`);
 
   const redisClient = createClient({
     url: process.env.REDIS_URL,
   });
+
+  await redisClient.connect();
 
   redisClient.on("connect", () => {
     logger.info(`Connected to redis`);
@@ -34,10 +37,7 @@ const connectToRedis = async (uri) => {
 
   redisClient.on("error", (err) => {
     logger.error(`Failed to connect to redis:: ${err}`);
-    process.exit();
   });
-
-  await redisClient.connect();
 };
 
 module.exports = { connectMongodb, connectToRedis };

@@ -7,7 +7,7 @@ const router = express.Router();
  *  get:
  *     tags:
  *     - Health
- *     summary: User login
+ *     summary: Server Health
  *     responses:
  *      200:
  *        description: Server running
