@@ -1,11 +1,11 @@
 "use strict";
 const { createLogger, format, transports } = require("winston");
 require("winston-daily-rotate-file");
-const fs = require("fs");
-const path = require("path");
-const appRootPath = require("app-root-path");
+// const fs = require("fs");
+// const path = require("path");
+// const appRootPath = require("app-root-path");
 
-const maxSizeInBytes = 5 * 1024 * 1024;
+// const maxSizeInBytes = 5 * 1024 * 1024;
 
 const options = {
   info: {
@@ -16,7 +16,7 @@ const options = {
     datePattern: "YYYY-MM-DD-HH",
     filename: `app_log_%DATE%.log`,
     maxSize: "5m",
-    maxFiles: "7d",
+    maxFiles: "2d",
     format: format.combine(
       format.printf((i) =>
         i.level === "info" ? `${i.level}: ${i.timestamp} ${i.message}` : ""
@@ -61,31 +61,31 @@ const logger = new createLogger({
 });
 
 // Function to clear the log file
-const clearLogFile = (logFilePath) => {
-  fs.truncate(logFilePath, 0, (err) => {
-    if (err) {
-      console.error("Error clearing log file:", err);
-    } else {
-      console.log("Log file cleared");
-    }
-  });
-};
+// const clearLogFile = (logFilePath) => {
+//   fs.truncate(logFilePath, 0, (err) => {
+//     if (err) {
+//       console.error("Error clearing log file:", err);
+//     } else {
+//       console.log("Log file cleared");
+//     }
+//   });
+// };
 
 // Function to monitor log file size
-const monitorLogFileSize = (logFilePath) => {
-  fs.stat(logFilePath, (err, stats) => {
-    if (err) {
-      console.error("Error getting log file stats:", err);
-      return;
-    }
+// const monitorLogFileSize = (logFilePath) => {
+//   fs.stat(logFilePath, (err, stats) => {
+//     if (err) {
+//       console.error("Error getting log file stats:", err);
+//       return;
+//     }
 
-    if (stats.size > maxSizeInBytes) {
-      clearLogFile(logFilePath);
-    }
-  });
-};
+//     if (stats.size > maxSizeInBytes) {
+//       clearLogFile(logFilePath);
+//     }
+//   });
+// };
 
-const logPath = path.join(appRootPath.path, "/logs/app.log");
+// const logPath = path.join(appRootPath.path, "/logs/app.log");
 
 // setInterval(() => {
 //   monitorLogFileSize(logPath);

@@ -3,6 +3,7 @@ const Joi = require("joi");
 const User = require("../models/User");
 const { comparePassword } = require("../helpers/utils");
 const { passwordRegex } = require("../constants");
+const sendMail = require("../config/NodeMailer");
 
 const register = async (req, res, next) => {
   try {
@@ -115,6 +116,12 @@ const login = async (req, res, next) => {
     // });
 
     // await tokenData.save();
+
+    await sendMail(
+      "You have logged in to your voter account.",
+      "Voter login",
+      user?.email
+    );
 
     return res.status(200).json({
       status: true,
