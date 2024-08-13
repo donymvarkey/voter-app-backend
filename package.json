@@ -1,7 +1,7 @@
 {
-  "name": "nodejs-server-boilerplate",
-  "version": "1.0.2",
-  "description": "Boilerplate for a Node.js Server with either MySQL or MONGODB as database. (Ofcourse you can use some other databases.)",
+  "name": "voter",
+  "version": "1.0.4",
+  "description": "An online voting platform",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/donymvarkey/nodejs-server-boilerplate.git"
+    "url": "https://github.com/donymvarkey/voter-app-backend.git"
   },
   "keywords": [
     "backend",
@@ -26,9 +26,9 @@
   "author": "Dony M Varkey",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/donymvarkey/nodejs-server-boilerplate.git"
+    "url": "https://github.com/donymvarkey/voter-app-backend.git"
   },
-  "homepage": "https://github.com/donymvarkey/nodejs-server-boilerplate.git#README",
+  "homepage": "https://github.com/donymvarkey/voter-app-backend.git",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.616.0",
     "@hapi/joi": "^17.1.1",
